@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Zoom WebSDK</title>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="origin-trial" 
+        content="ApbyCprSSGVaT3D3B6PtIv+n/9OBJNNvn90FOjL7bJcSHnPiF3EWtIu0cucMH4cSEaJfG+5/wMev1YBGHQNkHw0AAABLeyJvcmlnaW4iOiJodHRwczovLzAuMC4wLjA6MzAwMCIsImZlYXR1cmUiOiJXZWJDb2RlY3MiLCJleHBpcnkiOjE2MjYyMjA3OTl9"
+    >
+    <!-- The link below is for the mic and camera icons in this demo -->
+    <link 
+        rel="stylesheet" 
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" 
+        integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" 
+        crossorigin="anonymous" 
+    />
+    <script src="./static/index.min.js" defer></script>
+
+    <!-- face api -->
+    <script src="./src/js/face-api.min.js"></script>
+    <style>
+        .detect-canvas{
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            border-radius: 10px; 
+            z-index: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container app-root">
+        <!-- Preview view -->
+        <div id="js-preview-view" class="container preview__root">
+            <span>
+                <h1>Join Video Session</h1>
+            </span>
+            <div class="container video-app" style="position: relative;">
+                <!-- You can use any height or width you wish for the preview -->
+                <video id="js-preview-video" class="preview-video" playsinline="" muted="" data-video="0"></video>
+                <div class="container meeting-control-layer" style="z-index: 2;">
+                    <!-- "fas" and "fa" are icon prefixes for the font-awesome library -->
+                    <button id="js-preview-mic-button" class="meeting-control-button">
+                        <i id="js-preview-mic-icon" class="fas fa-microphone-slash"></i>
+                    </button>
+                    <button id="js-preview-webcam-button" class="meeting-control-button">
+                        <i id="js-preview-webcam-icon" class="fas fa-video webcam__off"></i>
+                    </button>
+                </div>
+                <!-- canvas untuk menggambar frame deteksi wajah  -->
+                <canvas id="canvas" width="800" height="450" class="detect-canvas"></canvas>
+            </div>
+            <button id="js-preview-join-button" class="join-button">
+                Join
+            </button>
+        </div>
+        <!-- Loading view -->
+        <div id="js-loading-view" class="container loading-view hidden">
+            <h1>Joining session, sit tight...</h1>
+            <i class="fas fa-spinner loading-spinner"></i>
+        </div>
+        <!-- In-session view -->
+        <div id="js-video-view" class="container video-app hidden" style="position: relative;">
+            <canvas id="video-canvas" class="video-canvas" width="1280" height="640"></canvas>
+            <div class="container meeting-control-layer" style="z-index: 2;">
+                <!-- "fas" and "fa" are icon prefixes for the font-awesome library -->
+                <button id="js-mic-button" class="meeting-control-button">
+                    <i id="js-mic-icon" class="fas fa-microphone-slash"></i>
+                </button>
+                <button id="js-webcam-button" class="meeting-control-button">
+                    <i id="js-webcam-icon" class="fas fa-video webcam__off"></i>
+                </button>
+                <div class="vertical-divider"></div>
+                <button id="js-leave-button" 
+                    class="meeting-control-button meeting-control-button__leave-session">
+                    <i id="js-leave-session-icon" class="fas fa-phone"></i>
+                </button>
+            </div>
+            <!-- canvas untuk menggambar frame deteksi wajah  -->
+            <canvas id="canvas" width="1280" height="640" class="detect-canvas"></canvas>
+        </div>
+        <!-- Ending view -->
+        <div id="js-end-view" class="container ending-view hidden">
+            <h1>You have successfully left the session!</h1>
+        </div>
+    </div>
+    <script>
+        let video = document.getElementById("js-preview-video");
+        let canvas = document.getElementById("canvas")
+        let meet = document.getElementById("video-canvas")
+        let ctx = canvas.getContext("2d");
+        let width = 800
+        let height = 450
+        let displaySize = {width, height};
+       
+        async function detect() {
+            // console.log(faceapi.nets);
+            const detections = await faceapi.detectAllFaces(video)
+                                            .withFaceLandmarks()
+                                            .withFaceExpressions()
+                                            .withAgeAndGender();
+            // console.log(detections)
+
+            const json = detections.map(val => {
+                const json = {
+                    age: val.age,
+                    expressions: val.expressions,
+                    gender: {
+                        gender: val.gender,
+                        genderProbability: val.genderProbability
+                    }
+                }
+                return json
+            })
+
+            // console.log(json)
+
+            // hapus canvas yg sebelumnya
+            ctx.clearRect(0,0, width, height);
+
+            // buat canvas baru
+            const resizedDetections = faceapi.resizeResults(detections, displaySize)
+            faceapi.draw.drawDetections(canvas, resizedDetections);
+            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+            faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
+        }
+
+        Promise.all([
+            faceapi.nets.ageGenderNet.loadFromUri('models'),
+            faceapi.nets.ssdMobilenetv1.loadFromUri('models'),
+            faceapi.nets.tinyFaceDetector.loadFromUri('models'),
+            faceapi.nets.faceLandmark68Net.loadFromUri('models'),
+            faceapi.nets.faceRecognitionNet.loadFromUri('models'),
+            faceapi.nets.faceExpressionNet.loadFromUri('models')
+        ]).then(setInterval(detect, 1000));
+    </script>
+</body>
+
+</html>
