@@ -10,7 +10,7 @@ referensi
 
 ## React Demo
 ```
-git clone git@github.com:Gustiana882/zoom-facedetection.git
+git clone git@github.com:Gusti13/zoom-facedetection.git
 cd sample-app-videosdk/react-demo
 npm install
 npm run start
@@ -21,7 +21,7 @@ Before you can use the demo app, you must update your config in ```react-demo/sr
 
 ## Purejs Demo
 ```
-git clone git@github.com:Gustiana882/zoom-facedetection.git
+git clone git@github.com:Gusti13/zoom-facedetection.git
 cd sample-app-videosdk/purejs-demo
 npm install
 npm run start
