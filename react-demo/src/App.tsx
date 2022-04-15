@@ -14,6 +14,7 @@ import Home from "./feature/home/home";
 import Video from "./feature/video/video";
 import VideoSingle from "./feature/video/video-single";
 import Preview from "./feature/preview/preview";
+import Camera from "./feature/autoCapture/preview";
 import ZoomContext from "./context/zoom-context";
 import ZoomMediaContext from "./context/media-context";
 import ChatContext from "./context/chat-context";
@@ -220,6 +221,10 @@ function App(props: AppProps) {
                 <Route
                   path="/preview"
                   component={Preview}
+                />
+                <Route
+                  path="/camera"
+                  component={Camera}
                 />
                 <Route path="/video" component={isSupportGalleryView ? Video : VideoSingle} />
                 <Route path="/chat" component={Chat} />

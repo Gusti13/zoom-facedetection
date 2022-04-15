@@ -23,23 +23,29 @@ const Home: React.FunctionComponent<HomeProps> = (props) => {
       description:
         'Gallery Layout, Start/Stop Audio, Mute/Unmute, Start/Stop Video, Start/Stop Screen Share',
     },
-    {
-      key: 'chat',
-      icon: 'icon-chat',
-      title: 'Session chat',
-      description: 'Session Chat, Chat Priviledge',
-    },
-    {
-      key: "command",
-      icon: "icon-chat",
-      title: "Command Channel chat",
-      description: "Session Command Channel chat"
-    },
+    // {
+    //   key: 'chat',
+    //   icon: 'icon-chat',
+    //   title: 'Session chat',
+    //   description: 'Session Chat, Chat Priviledge',
+    // },
+    // {
+    //   key: "command",
+    //   icon: "icon-chat",
+    //   title: "Command Channel chat",
+    //   description: "Session Command Channel chat"
+    // },
     {
       key: 'preview',
       icon: 'icon-meeting',
       title: 'Local Preview',
       description: 'Audio and Video preview',
+    },
+    {
+      key: 'camera',
+      icon: 'icon-meeting',
+      title: 'Ambil Gambar',
+      description: 'ambil gambar dari kamera setiap 5 detik',
     },
   ];
   let actionText;
